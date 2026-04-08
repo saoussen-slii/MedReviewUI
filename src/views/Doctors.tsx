@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom'
 import DoctorCard from '../components/DoctorCard'
 import type { Doctor, JsonPlaceholderUser } from '../types'
 import { mapUserToDoctor } from './doctorsUtils'
+import { SKELETON_IDS, USERS_URL } from './doctorsConstants'
 
-const USERS_URL = 'https://jsonplaceholder.typicode.com/users'
 
 const DoctorCardSkeleton = () => (
   <div
@@ -24,7 +24,6 @@ const DoctorCardSkeleton = () => (
   </div>
 )
 
-const SKELETON_IDS = ['s-1', 's-2', 's-3', 's-4', 's-5', 's-6'] as const
 
 const Doctors = () => {
   const [doctors, setDoctors] = useState<Doctor[]>([])
