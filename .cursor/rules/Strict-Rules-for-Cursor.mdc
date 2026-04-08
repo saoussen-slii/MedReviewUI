@@ -1,0 +1,11 @@
+---
+description: Project-wide strict rules for MedReviewUI stack and architecture
+alwaysApply: true
+---
+
+# Strict Rules
+- **Tech Stack:** pnpm, TypeScript (strict mode), Tailwind CSS, GraphQL (Apollo Client)
+- **Linting:** Use ESLint + Prettier. Prefer functional components and Arrow functions.
+- **Styling:** Utility-first Tailwind only. No CSS files unless necessary. Ensure all components are fully responsive using a mobile-first approach.
+- **Data:** Use https://jsonplaceholder.typicode.com/ as the REST source, but wrap it in a GraphQL schema.
+- **State Management:** Use Redux Toolkit (RTK) to manage local state for added reviews.
