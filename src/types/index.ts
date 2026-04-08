@@ -14,3 +14,18 @@ export type Doctor = {
   hospital: string
   professionalProfileUrl: string
 }
+
+
+export type JsonPlaceholderUser = {
+  id: number
+  name: string
+  username: string
+  email: string
+  phone: string
+  website: string
+  company: {
+    name: string
+    catchPhrase: string
+    bs: string
+  }
+}

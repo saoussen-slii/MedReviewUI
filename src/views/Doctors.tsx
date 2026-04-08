@@ -1,41 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import type { Doctor } from '../types'
+import type { Doctor, JsonPlaceholderUser } from '../types'
+import { mapUserToDoctor } from './doctorsUtils.ts'
 
-const USERS_URL = 'https://jsonplaceholder.typicode.com/users'
-
-type JsonPlaceholderUser = {
-  id: number
-  name: string
-  username: string
-  email: string
-  phone: string
-  website: string
-  company: {
-    name: string
-    catchPhrase: string
-    bs: string
-  }
-}
-
-const mapUserToDoctor = (user: JsonPlaceholderUser): Doctor => {
-  const website = user.website.trim()
-  const professionalProfileUrl =
-    website.startsWith('http://') || website.startsWith('https://')
-      ? website
-      : `https://${website}`
-
-  return {
-    id: user.id,
-    name: user.name,
-    username: user.username,
-    email: user.email,
-    phone: user.phone,
-    hospital: user.company.name,
-    professionalProfileUrl,
-  }
-}
+const USERS_URL = 'https://jsonplaceholder.typicode.com/users';
 
 const DoctorCardSkeleton = () => (
   <div
