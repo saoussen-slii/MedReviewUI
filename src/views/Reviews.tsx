@@ -94,35 +94,37 @@ const Reviews = () => {
           ← Back to doctors
         </Link>
 
-        <h1 className="mt-6 text-2xl font-semibold tracking-tight md:text-3xl">
-          Reviews
-        </h1>
-        <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-center">
-          <p className="text-sm text-slate-600 md:text-base">
-            Doctor ID: {doctorId ?? '—'}
-          </p>
-          <div className="flex flex-col justify-end gap-4 sm:ml-auto sm:flex-row">
-            <button
-              type="button"
-              className={`${buttonVariants.primary} w-full sm:w-auto sm:min-w-24`}
-              onClick={() => setAddDialogOpen(true)}
-            >
-              Add
-            </button>
-            <button
-              type="button"
-              className={`${buttonVariants.danger} w-full sm:w-auto sm:min-w-24 disabled:cursor-not-allowed disabled:opacity-50`}
-              disabled={
-                !activeSelection ||
-                activeSelection.source !== 'local' ||
-                !doctorId
-              }
-              onClick={handleDeleteReview}
-            >
-              Delete
-            </button>
+        <header className="sticky top-0 z-20 -mx-4 mt-6 border-b border-slate-200/80 bg-slate-50/95 px-4 pb-4 pt-1 shadow-sm backdrop-blur-sm md:-mx-6 md:px-6">
+          <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
+            Reviews
+          </h1>
+          <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-center">
+            <p className="text-sm text-slate-600 md:text-base">
+              Doctor ID: {doctorId ?? '—'}
+            </p>
+            <div className="flex flex-col justify-end gap-4 sm:ml-auto sm:flex-row">
+              <button
+                type="button"
+                className={`${buttonVariants.primary} w-full sm:w-auto sm:min-w-24`}
+                onClick={() => setAddDialogOpen(true)}
+              >
+                Add
+              </button>
+              <button
+                type="button"
+                className={`${buttonVariants.danger} w-full sm:w-auto sm:min-w-24 disabled:cursor-not-allowed disabled:opacity-50`}
+                disabled={
+                  !activeSelection ||
+                  activeSelection.source !== 'local' ||
+                  !doctorId
+                }
+                onClick={handleDeleteReview}
+              >
+                Delete
+              </button>
+            </div>
           </div>
-        </div>
+        </header>
 
         <AddReviewDialog
           open={addDialogOpen}
