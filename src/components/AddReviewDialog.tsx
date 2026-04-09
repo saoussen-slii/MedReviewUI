@@ -28,7 +28,7 @@ const AddReviewDialog = ({ open, onClose, onSubmit }: AddReviewDialogProps) => {
   const [form, setForm] = useState(emptyForm)
 
   const canSubmit =
-    form.title.trim().length > 0 ||
+    form.title.trim().length > 0 &&
     form.body.trim().length > 0
 
   const handleClose = () => {
