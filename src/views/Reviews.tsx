@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
 import Review from '../components/Review'
@@ -8,15 +8,21 @@ import {
   addReview,
   deleteReviewById,
   fetchReviewsByDoctorId,
+  removeRemoteReviewById,
   selectLocalReviewsForDoctor,
   selectRemoteReviews,
   selectRemoteReviewsError,
   selectRemoteReviewsLoading,
 } from '../store/slices/reviewsSlice'
 
+type SelectedReview = { source: 'local' | 'remote'; id: number }
+
 const Reviews = () => {
   const { doctorId } = useParams()
   const dispatch = useAppDispatch()
+  const [selectedReview, setSelectedReview] = useState<SelectedReview | null>(
+    null,
+  )
   const loading = useAppSelector(selectRemoteReviewsLoading)
   const error = useAppSelector(selectRemoteReviewsError)
   const remote = useAppSelector(selectRemoteReviews)
@@ -26,6 +32,7 @@ const Reviews = () => {
 
   const displayRows = useMemo(() => {
     const fromLocal = localForDoctor.map((r) => ({
+      source: 'local' as const,
       review: {
         id: r.id,
         name: r.title,
@@ -34,6 +41,7 @@ const Reviews = () => {
       },
     }))
     const fromRemote = remote.map((r) => ({
+      source: 'remote' as const,
       review: {
         id: r.id,
         name: r.name,
@@ -49,9 +57,21 @@ const Reviews = () => {
     void dispatch(fetchReviewsByDoctorId(doctorId))
   }, [dispatch, doctorId])
 
-  const handleDeleteReview = (reviewId: number) => {
-    if (!doctorId) return
-    dispatch(deleteReviewById({ doctorId, reviewId }))
+  useEffect(() => {
+    setSelectedReview(null)
+  }, [doctorId])
+
+  const isSelected = (row: { source: SelectedReview['source']; review: { id: number } }) =>
+    selectedReview?.source === row.source && selectedReview.id === row.review.id
+
+  const handleDeleteReview = () => {
+    if (!doctorId || !selectedReview) return
+    if (selectedReview.source === 'local') {
+      dispatch(deleteReviewById({ doctorId, reviewId: selectedReview.id }))
+    } else {
+      dispatch(removeRemoteReviewById({ reviewId: selectedReview.id }))
+    }
+    setSelectedReview(null)
   }
 
   const handleAddReview = () => {
@@ -94,8 +114,9 @@ const Reviews = () => {
             </button>
             <button
               type="button"
-              className={`${buttonVariants.danger} w-full sm:w-auto sm:min-w-24`}
-              onClick={() => handleDeleteReview(review.id)}
+              className={`${buttonVariants.danger} w-full sm:w-auto sm:min-w-24 disabled:cursor-not-allowed disabled:opacity-50`}
+              disabled={!selectedReview || !doctorId}
+              onClick={handleDeleteReview}
             >
               Delete
             </button>
@@ -113,8 +134,18 @@ const Reviews = () => {
           </p>
         ) : displayRows.length > 0 ? (
           <div className="mt-8 grid grid-cols-1 gap-6">
-            {displayRows.map(({ review }) => (
-              <Review key={review.id} review={review} />
+            {displayRows.map((row) => (
+              <Review
+                key={`${row.source}-${row.review.id}`}
+                review={row.review}
+                isSelected={isSelected(row)}
+                onSelect={() =>
+                  setSelectedReview({
+                    source: row.source,
+                    id: row.review.id,
+                  })
+                }
+              />
             ))}
           </div>
         ) : (

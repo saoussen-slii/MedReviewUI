@@ -5,10 +5,27 @@ type ReviewProps = {
     email: string
     body: string
   }
+  isSelected: boolean
+  onSelect: () => void
 }
 
-const Review = ({ review }: ReviewProps) => (
-  <article className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+const Review = ({ review, isSelected, onSelect }: ReviewProps) => (
+  <article
+    role="button"
+    tabIndex={0}
+    onClick={onSelect}
+    onKeyDown={(e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        onSelect()
+      }
+    }}
+    className={`cursor-pointer rounded-xl border bg-white p-5 transition-all duration-200 hover:-translate-y-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600 ${
+      isSelected
+        ? 'border-teal-600/80 shadow-lg ring-2 ring-teal-600/40'
+        : 'border-slate-200/80 shadow-sm hover:shadow-lg'
+    }`}
+  >
     <header className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0">
         <h2 className="truncate text-base font-semibold text-slate-900">
