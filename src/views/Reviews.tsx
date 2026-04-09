@@ -1,24 +1,34 @@
+import { useQuery } from '@apollo/client'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
 import AddReviewDialog from '../components/AddReviewDialog'
 import Review from '../components/Review'
 import { buttonVariants } from '../components/buttonStyles'
+import { REVIEWS_BY_DOCTOR_QUERY } from '../graphql/queries'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import {
   addReview,
   deleteReviewById,
-  fetchReviewsByDoctorId,
   selectLocalReviewsForDoctor,
   selectRemoteReviews,
-  selectRemoteReviewsError,
-  selectRemoteReviewsLoading,
+  setRemoteReviews,
 } from '../store/slices/reviewsSlice'
 
 type SelectedReview = {
   doctorId: string
   source: 'local' | 'remote'
   id: number
+}
+
+type ReviewsQueryData = {
+  reviewsByDoctorId: {
+    postId: number
+    id: number
+    name: string
+    email: string
+    body: string
+  }[]
 }
 
 const Reviews = () => {
@@ -29,8 +39,24 @@ const Reviews = () => {
   )
   const [addDialogOpen, setAddDialogOpen] = useState(false)
 
-  const loading = useAppSelector(selectRemoteReviewsLoading)
-  const error = useAppSelector(selectRemoteReviewsError)
+  const { data, loading, error } = useQuery<ReviewsQueryData>(
+    REVIEWS_BY_DOCTOR_QUERY,
+    {
+      variables: { doctorId: doctorId ?? '' },
+      skip: !doctorId,
+    },
+  )
+
+  useEffect(() => {
+    dispatch(setRemoteReviews([]))
+  }, [doctorId, dispatch])
+
+  useEffect(() => {
+    if (data?.reviewsByDoctorId) {
+      dispatch(setRemoteReviews(data.reviewsByDoctorId))
+    }
+  }, [data, dispatch])
+
   const remote = useAppSelector(selectRemoteReviews)
   const localForDoctor = useAppSelector((state) =>
     selectLocalReviewsForDoctor(state, doctorId),
@@ -57,11 +83,6 @@ const Reviews = () => {
     }))
     return [...fromLocal, ...fromRemote]
   }, [localForDoctor, remote])
-
-  useEffect(() => {
-    if (!doctorId) return
-    void dispatch(fetchReviewsByDoctorId(doctorId))
-  }, [dispatch, doctorId])
 
   const activeSelection =
     selectedReview && selectedReview.doctorId === doctorId
@@ -142,7 +163,7 @@ const Reviews = () => {
             className="mt-8 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
             role="alert"
           >
-            {error}
+            {error.message}
           </p>
         ) : displayRows.length > 0 ? (
           <div className="mt-8 grid grid-cols-1 gap-6">

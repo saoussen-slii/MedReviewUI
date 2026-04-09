@@ -1,7 +1,6 @@
-import { createAsyncThunk, createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit'
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit'
 
 import type { Review } from '../../types'
-import { BASE_URL } from '../../views/doctorsConstants'
 import type { RootState } from '../store'
 
 export type JsonPlaceholderComment = {
@@ -15,15 +14,11 @@ export type JsonPlaceholderComment = {
 type ReviewsState = {
   items: Review[]
   remoteItems: JsonPlaceholderComment[]
-  remoteLoading: boolean
-  remoteError: string | null
 }
 
 const initialState: ReviewsState = {
   items: [],
   remoteItems: [],
-  remoteLoading: false,
-  remoteError: null,
 }
 
 const maxReviewId = (items: Review[], remote: JsonPlaceholderComment[]): number => {
@@ -43,24 +38,6 @@ export type DeleteReviewByIdPayload = {
   reviewId: number
 }
 
-export const fetchReviewsByDoctorId = createAsyncThunk<
-  JsonPlaceholderComment[],
-  string,
-  { rejectValue: string }
->('reviews/fetchByDoctorId', async (doctorId, { rejectWithValue }) => {
-  try {
-    const res = await fetch(`${BASE_URL}/comments?postId=${doctorId}`)
-    if (!res.ok) {
-      return rejectWithValue(`Could not load comments (${res.status})`)
-    }
-    return (await res.json()) as JsonPlaceholderComment[]
-  } catch (e) {
-    return rejectWithValue(
-      e instanceof Error ? e.message : 'Failed to load comments',
-    )
-  }
-})
-
 const reviewsSlice = createSlice({
   name: 'reviews',
   initialState,
@@ -78,25 +55,17 @@ const reviewsSlice = createSlice({
         (r) => !(r.doctorId === doctorId && r.id === reviewId),
       )
     },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchReviewsByDoctorId.pending, (state) => {
-        state.remoteLoading = true
-        state.remoteError = null
-      })
-      .addCase(fetchReviewsByDoctorId.fulfilled, (state, action) => {
-        state.remoteLoading = false
-        state.remoteItems = action.payload
-      })
-      .addCase(fetchReviewsByDoctorId.rejected, (state, action) => {
-        state.remoteLoading = false
-        state.remoteError = action.payload ?? 'Failed to load comments'
-      })
+    setRemoteReviews: (
+      state,
+      action: PayloadAction<JsonPlaceholderComment[]>,
+    ) => {
+      state.remoteItems = action.payload
+    },
   },
 })
 
-export const { addReview, deleteReviewById } = reviewsSlice.actions
+export const { addReview, deleteReviewById, setRemoteReviews } =
+  reviewsSlice.actions
 export default reviewsSlice.reducer
 
 const selectReviewsState = (state: RootState) => state.reviews
@@ -104,16 +73,6 @@ const selectReviewsState = (state: RootState) => state.reviews
 export const selectRemoteReviews = createSelector(
   [selectReviewsState],
   (reviews) => reviews.remoteItems,
-)
-
-export const selectRemoteReviewsLoading = createSelector(
-  [selectReviewsState],
-  (reviews) => reviews.remoteLoading,
-)
-
-export const selectRemoteReviewsError = createSelector(
-  [selectReviewsState],
-  (reviews) => reviews.remoteError,
 )
 
 export const selectLocalReviewsForDoctor = createSelector(

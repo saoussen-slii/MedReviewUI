@@ -1,26 +1,18 @@
-import { useEffect } from 'react'
+import { useQuery } from '@apollo/client'
 import { Link } from 'react-router-dom'
 
 import DoctorCard from '../components/DoctorCard'
 import DoctorCardSkeleton from '../components/DoctorCardSkeleton'
-import { useAppDispatch, useAppSelector } from '../store/hooks'
-import {
-  fetchDoctors,
-  selectDoctors,
-  selectDoctorsError,
-  selectDoctorsLoading,
-} from '../store/slices/doctorsSlice'
+import { DOCTORS_QUERY } from '../graphql/queries'
+import type { Doctor } from '../types'
 import { SKELETON_IDS } from './doctorsConstants'
 
 const Doctors = () => {
-  const dispatch = useAppDispatch()
-  const doctors = useAppSelector(selectDoctors)
-  const loading = useAppSelector(selectDoctorsLoading)
-  const error = useAppSelector(selectDoctorsError)
+  const { data, loading, error } = useQuery<{ doctors: Doctor[] }>(
+    DOCTORS_QUERY,
+  )
 
-  useEffect(() => {
-    void dispatch(fetchDoctors())
-  }, [dispatch])
+  const doctors = data?.doctors ?? []
 
   return (
     <div className="min-h-svh bg-slate-50 px-4 py-8 text-slate-900 md:px-6">
@@ -35,8 +27,8 @@ const Doctors = () => {
           Doctors
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-slate-600 md:text-base">
-          Directory sourced from JSONPlaceholder. Hospital and professional
-          profile are mapped from each user&apos;s company and website.
+          Directory loaded via GraphQL (Apollo Client). Backend wraps JSONPlaceholder
+          users as doctors.
         </p>
 
         {error ? (
@@ -44,7 +36,7 @@ const Doctors = () => {
             className="mt-8 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
             role="alert"
           >
-            {error}
+            {error.message}
           </p>
         ) : null}
 

@@ -37,7 +37,7 @@ const App = () => (
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/doctors" element={<Doctors />} />
-      <Route path="doctors/:doctorId/reviews" element={<Reviews />} />
+      <Route path="/doctors/:doctorId/reviews" element={<Reviews />} />
     </Routes>
   </BrowserRouter>
 )

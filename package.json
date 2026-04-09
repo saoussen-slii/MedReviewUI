@@ -6,6 +6,8 @@
   "packageManager": "pnpm@10.33.0",
   "scripts": {
     "dev": "vite",
+    "server": "pnpm -C server run dev",
+    "dev:stack": "concurrently -k \"pnpm run dev\" \"pnpm run server\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -36,6 +38,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
+    "concurrently": "^9.2.1",
     "prettier": "^3.8.1",
     "tailwindcss": "^4.2.2",
     "typescript": "~6.0.2",
