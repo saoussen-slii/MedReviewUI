@@ -1,7 +1,7 @@
 type ReviewProps = {
   review: {
     id: number
-    name: string
+    title: string
     email: string
     body: string
   }
@@ -29,7 +29,7 @@ const Review = ({ review, isSelected, onSelect }: ReviewProps) => (
     <header className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0">
         <h2 className="truncate text-base font-semibold text-slate-900">
-          {review.name}
+          {review.title}
         </h2>
         <p className="mt-0.5 text-sm text-slate-600">{review.email}</p>
       </div>

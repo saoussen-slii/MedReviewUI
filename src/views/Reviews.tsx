@@ -1,4 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogTitle from '@mui/material/DialogTitle'
 import { Link, useParams } from 'react-router-dom'
 
 import Review from '../components/Review'
@@ -14,7 +18,17 @@ import {
   selectRemoteReviewsLoading,
 } from '../store/slices/reviewsSlice'
 
-type SelectedReview = { source: 'local' | 'remote'; id: number }
+type SelectedReview = {
+  doctorId: string
+  source: 'local' | 'remote'
+  id: number
+}
+
+const emptyForm = {
+  title: '',
+  email: '',
+  body: '',
+}
 
 const Reviews = () => {
   const { doctorId } = useParams()
@@ -22,6 +36,9 @@ const Reviews = () => {
   const [selectedReview, setSelectedReview] = useState<SelectedReview | null>(
     null,
   )
+  const [addDialogOpen, setAddDialogOpen] = useState(false)
+  const [form, setForm] = useState(emptyForm)
+
   const loading = useAppSelector(selectRemoteReviewsLoading)
   const error = useAppSelector(selectRemoteReviewsError)
   const remote = useAppSelector(selectRemoteReviews)
@@ -34,7 +51,7 @@ const Reviews = () => {
       source: 'local' as const,
       review: {
         id: r.id,
-        name: r.title,
+        title: r.title,
         email: r.email,
         body: r.body,
       },
@@ -43,7 +60,7 @@ const Reviews = () => {
       source: 'remote' as const,
       review: {
         id: r.id,
-        name: r.name,
+        title: r.name as string,
         email: r.email,
         body: r.body,
       },
@@ -56,30 +73,52 @@ const Reviews = () => {
     void dispatch(fetchReviewsByDoctorId(doctorId))
   }, [dispatch, doctorId])
 
-  useEffect(() => {
-    setSelectedReview(null)
-  }, [doctorId])
+  const activeSelection =
+    selectedReview && selectedReview.doctorId === doctorId
+      ? selectedReview
+      : null
 
-  const isSelected = (row: { source: SelectedReview['source']; review: { id: number } }) =>
-    selectedReview?.source === row.source && selectedReview.id === row.review.id
+  const isSelected = (row: {
+    source: SelectedReview['source']
+    review: { id: number }
+  }) =>
+    activeSelection?.source === row.source &&
+    activeSelection.id === row.review.id
 
   const handleDeleteReview = () => {
-    if (!doctorId || !selectedReview || selectedReview.source !== 'local') return
-    dispatch(deleteReviewById({ doctorId, reviewId: selectedReview.id }))
+    if (!doctorId || !activeSelection || activeSelection.source !== 'local')
+      return
+    dispatch(
+      deleteReviewById({ doctorId, reviewId: activeSelection.id }),
+    )
     setSelectedReview(null)
   }
 
-  const handleAddReview = () => {
-    if (!doctorId) return
+  const resetForm = () => {
+    setForm(emptyForm)
+  }
+
+  const handleCloseAddDialog = () => {
+    setAddDialogOpen(false)
+    resetForm()
+  }
+
+  const canSubmitAdd =
+    form.title.trim().length > 0 &&
+    form.email.trim().length > 0 &&
+    form.body.trim().length > 0
+
+  const handleSubmitAdd = () => {
+    if (!doctorId || !canSubmitAdd) return
     dispatch(
       addReview({
         doctorId,
-        title: 'Anonymous patient',
-        email: 'patient.placeholder@example.com',
-        body:
-          'Excellent care and clear communication. This review was added from the app as sample data.',
+        title: form.title.trim(),
+        email: form.email.trim(),
+        body: form.body.trim(),
       }),
     )
+    handleCloseAddDialog()
   }
 
   return (
@@ -103,7 +142,7 @@ const Reviews = () => {
             <button
               type="button"
               className={`${buttonVariants.primary} w-full sm:w-auto sm:min-w-24`}
-              onClick={handleAddReview}
+              onClick={() => setAddDialogOpen(true)}
             >
               Add
             </button>
@@ -111,8 +150,8 @@ const Reviews = () => {
               type="button"
               className={`${buttonVariants.danger} w-full sm:w-auto sm:min-w-24 disabled:cursor-not-allowed disabled:opacity-50`}
               disabled={
-                !selectedReview ||
-                selectedReview.source !== 'local' ||
+                !activeSelection ||
+                activeSelection.source !== 'local' ||
                 !doctorId
               }
               onClick={handleDeleteReview}
@@ -121,6 +160,81 @@ const Reviews = () => {
             </button>
           </div>
         </div>
+
+        <Dialog
+          open={addDialogOpen}
+          onClose={handleCloseAddDialog}
+          slotProps={{
+            paper: {
+              className:
+                'w-full max-w-lg rounded-xl border border-slate-200/80 bg-white p-0 shadow-lg',
+            },
+            backdrop: {
+              className: 'bg-slate-900/40',
+            },
+          }}
+        >
+          <DialogTitle className="border-b border-slate-200/80 px-6 py-4 text-lg font-semibold text-slate-900">
+            Add review
+          </DialogTitle>
+          <DialogContent className="flex flex-col gap-4 px-6 pt-6 pb-2">
+            <label className="block text-sm font-medium text-slate-700">
+              Title
+              <input
+                type="text"
+                value={form.title}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, title: e.target.value }))
+                }
+                className="mt-1.5 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition-colors placeholder:text-slate-400 focus:border-teal-600 focus:ring-2 focus:ring-teal-600/30"
+                placeholder="Reviewer title"
+                autoComplete="title"
+              />
+            </label>
+            <label className="block text-sm font-medium text-slate-700">
+              Email
+              <input
+                type="email"
+                value={form.email}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, email: e.target.value }))
+                }
+                className="mt-1.5 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition-colors placeholder:text-slate-400 focus:border-teal-600 focus:ring-2 focus:ring-teal-600/30"
+                placeholder="email@example.com"
+                autoComplete="email"
+              />
+            </label>
+            <label className="block text-sm font-medium text-slate-700">
+              Body
+              <textarea
+                value={form.body}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, body: e.target.value }))
+                }
+                rows={4}
+                className="mt-1.5 w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition-colors placeholder:text-slate-400 focus:border-teal-600 focus:ring-2 focus:ring-teal-600/30"
+                placeholder="Write your review…"
+              />
+            </label>
+          </DialogContent>
+          <DialogActions className="gap-2 border-t border-slate-200/80 px-6 py-4">
+            <button
+              type="button"
+              className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400"
+              onClick={handleCloseAddDialog}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              disabled={!canSubmitAdd}
+              className={`${buttonVariants.primary} disabled:cursor-not-allowed disabled:opacity-50`}
+              onClick={handleSubmitAdd}
+            >
+              Add
+            </button>
+          </DialogActions>
+        </Dialog>
 
         {loading ? (
           <p className="mt-8 text-sm text-slate-600">Loading…</p>
@@ -138,12 +252,14 @@ const Reviews = () => {
                 key={`${row.source}-${row.review.id}`}
                 review={row.review}
                 isSelected={isSelected(row)}
-                onSelect={() =>
+                onSelect={() => {
+                  if (!doctorId) return
                   setSelectedReview({
+                    doctorId,
                     source: row.source,
                     id: row.review.id,
                   })
-                }
+                }}
               />
             ))}
           </div>
