@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { buttonVariants } from './buttonStyles'
 import type { Doctor } from '../types'
 
 type DoctorCardProps = {
@@ -34,13 +35,13 @@ const DoctorCard = ({ doctor }: DoctorCardProps) => (
               href={doctor.professionalProfileUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+              className={buttonVariants.primary}
             >
               Professional profile
             </a>
             <Link
-              to={`/doctors/${doctor.id}/reviews`}
-              className="inline-flex items-center justify-center rounded-lg border border-teal-600 bg-white px-4 py-2 text-sm font-semibold text-teal-700 shadow-sm transition-colors hover:bg-teal-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+              to={`/comments/${doctor.id}`}
+              className={buttonVariants.outline}
             >
               Reviews
             </Link>

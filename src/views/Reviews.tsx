@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
 import Review from '../components/Review'
+import { buttonVariants } from '../components/buttonStyles'
 import { BASE_URL } from './doctorsConstants'
 
 type JsonPlaceholderComment = {
@@ -66,9 +67,25 @@ const Reviews = () => {
         <h1 className="mt-6 text-2xl font-semibold tracking-tight md:text-3xl">
           Reviews
         </h1>
-        <p className="mt-2 text-sm text-slate-600 md:text-base">
-          Doctor ID: {doctorId ?? '—'}
-        </p>
+        <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <p className="text-sm text-slate-600 md:text-base">
+            Doctor ID: {doctorId ?? '—'}
+          </p>
+          <div className="flex flex-col justify-end gap-4 sm:ml-auto sm:flex-row">
+            <button
+              type="button"
+              className={`${buttonVariants.primary} w-full sm:w-auto sm:min-w-24`}
+            >
+              Add
+            </button>
+            <button
+              type="button"
+              className={`${buttonVariants.danger} w-full sm:w-auto sm:min-w-24`}
+            >
+              Delete
+            </button>
+          </div>
+        </div>
 
         {loading ? (
           <p className="mt-8 text-sm text-slate-600">Loading…</p>
