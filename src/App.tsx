@@ -2,6 +2,7 @@ import { HeartPulse } from 'lucide-react'
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
 
 import Doctors from './views/Doctors'
+import Reviews from './views/Reviews.tsx'
 
 const Home = () => (
   <div className="min-h-svh bg-slate-50 px-4 py-8 text-slate-900 md:px-6">
@@ -36,6 +37,7 @@ const App = () => (
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/doctors" element={<Doctors />} />
+      <Route path="doctors/:doctorId/reviews" element={<Reviews />} />
     </Routes>
   </BrowserRouter>
 )

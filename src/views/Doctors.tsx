@@ -5,7 +5,7 @@ import DoctorCard from '../components/DoctorCard'
 import DoctorCardSkeleton from '../components/DoctorCardSkeleton'
 import type { Doctor, JsonPlaceholderUser } from '../types'
 import { mapUserToDoctor } from './doctorsUtils'
-import { SKELETON_IDS, USERS_URL } from './doctorsConstants'
+import { SKELETON_IDS, BASE_URL } from './doctorsConstants'
 
 const Doctors = () => {
   const [doctors, setDoctors] = useState<Doctor[]>([])
@@ -19,7 +19,7 @@ const Doctors = () => {
       setLoading(true)
       setError(null)
       try {
-        const res = await fetch(USERS_URL)
+        const res = await fetch(`${BASE_URL}/users`)
         if (!res.ok) {
           throw new Error(`Could not load directory (${res.status})`)
         }
