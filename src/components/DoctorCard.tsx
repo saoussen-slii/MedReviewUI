@@ -40,7 +40,7 @@ const DoctorCard = ({ doctor }: DoctorCardProps) => (
               Professional profile
             </a>
             <Link
-              to={`/comments/${doctor.id}`}
+              to={`/doctors/${doctor.id}/reviews`}
               className={buttonVariants.outline}
             >
               Reviews
