@@ -1,6 +1,8 @@
 export type Review = {
   id: string
+  doctorId: string
   title: string
+  email: string
   body: string
 }
 
@@ -13,6 +15,7 @@ export type Doctor = {
   phone: string
   hospital: string
   professionalProfileUrl: string
+  Reviews?: Review[]
 }
 
 

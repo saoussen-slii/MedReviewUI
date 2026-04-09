@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 
-import type { Review } from '../types'
+import type { Review } from '../../types'
 
 type ReviewsState = {
   items: Review[]

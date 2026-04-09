@@ -1,7 +1,6 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client'
 
-/** Point this at your GraphQL server that wraps https://jsonplaceholder.typicode.com/ */
 export const apolloClient = new ApolloClient({
-  uri: '/graphql',
+  uri: import.meta.env['VITE_GRAPHQL_API'] ?? 'http://localhost:4000/graphql',
   cache: new InMemoryCache(),
 })
