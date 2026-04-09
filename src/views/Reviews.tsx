@@ -8,7 +8,6 @@ import {
   addReview,
   deleteReviewById,
   fetchReviewsByDoctorId,
-  removeRemoteReviewById,
   selectLocalReviewsForDoctor,
   selectRemoteReviews,
   selectRemoteReviewsError,
@@ -65,12 +64,8 @@ const Reviews = () => {
     selectedReview?.source === row.source && selectedReview.id === row.review.id
 
   const handleDeleteReview = () => {
-    if (!doctorId || !selectedReview) return
-    if (selectedReview.source === 'local') {
-      dispatch(deleteReviewById({ doctorId, reviewId: selectedReview.id }))
-    } else {
-      dispatch(removeRemoteReviewById({ reviewId: selectedReview.id }))
-    }
+    if (!doctorId || !selectedReview || selectedReview.source !== 'local') return
+    dispatch(deleteReviewById({ doctorId, reviewId: selectedReview.id }))
     setSelectedReview(null)
   }
 
@@ -115,7 +110,11 @@ const Reviews = () => {
             <button
               type="button"
               className={`${buttonVariants.danger} w-full sm:w-auto sm:min-w-24 disabled:cursor-not-allowed disabled:opacity-50`}
-              disabled={!selectedReview || !doctorId}
+              disabled={
+                !selectedReview ||
+                selectedReview.source !== 'local' ||
+                !doctorId
+              }
               onClick={handleDeleteReview}
             >
               Delete

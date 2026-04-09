@@ -43,10 +43,6 @@ export type DeleteReviewByIdPayload = {
   reviewId: number
 }
 
-export type RemoveRemoteReviewByIdPayload = {
-  reviewId: number
-}
-
 export const fetchReviewsByDoctorId = createAsyncThunk<
   JsonPlaceholderComment[],
   string,
@@ -82,13 +78,6 @@ const reviewsSlice = createSlice({
         (r) => !(r.doctorId === doctorId && r.id === reviewId),
       )
     },
-    removeRemoteReviewById: (
-      state,
-      action: PayloadAction<RemoveRemoteReviewByIdPayload>,
-    ) => {
-      const { reviewId } = action.payload
-      state.remoteItems = state.remoteItems.filter((r) => r.id !== reviewId)
-    },
   },
   extraReducers: (builder) => {
     builder
@@ -107,8 +96,7 @@ const reviewsSlice = createSlice({
   },
 })
 
-export const { addReview, deleteReviewById, removeRemoteReviewById } =
-  reviewsSlice.actions
+export const { addReview, deleteReviewById } = reviewsSlice.actions
 export default reviewsSlice.reducer
 
 const selectReviewsState = (state: RootState) => state.reviews
