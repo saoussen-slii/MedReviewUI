@@ -1,5 +1,5 @@
 export type Review = {
-  id: string
+  id: number
   doctorId: string
   title: string
   email: string

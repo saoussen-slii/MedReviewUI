@@ -1,58 +1,65 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
 import Review from '../components/Review'
 import { buttonVariants } from '../components/buttonStyles'
-import { BASE_URL } from './doctorsConstants'
-
-type JsonPlaceholderComment = {
-  postId: number
-  id: number
-  name: string
-  email: string
-  body: string
-}
+import { useAppDispatch, useAppSelector } from '../store/hooks'
+import {
+  addReview,
+  fetchReviewsByDoctorId,
+  selectLocalReviewsForDoctor,
+  selectRemoteReviews,
+  selectRemoteReviewsError,
+  selectRemoteReviewsLoading,
+} from '../store/slices/reviewsSlice'
 
 const Reviews = () => {
   const { doctorId } = useParams()
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [data, setData] = useState<JsonPlaceholderComment[] | null>(null)
+  const dispatch = useAppDispatch()
+  const loading = useAppSelector(selectRemoteReviewsLoading)
+  const error = useAppSelector(selectRemoteReviewsError)
+  const remote = useAppSelector(selectRemoteReviews)
+  const localForDoctor = useAppSelector((state) =>
+    selectLocalReviewsForDoctor(state, doctorId),
+  )
+
+  const displayRows = useMemo(() => {
+    const fromLocal = localForDoctor.map((r) => ({
+      review: {
+        id: r.id,
+        name: r.title,
+        email: r.email,
+        body: r.body,
+      },
+    }))
+    const fromRemote = remote.map((r) => ({
+      review: {
+        id: r.id,
+        name: r.name,
+        email: r.email,
+        body: r.body,
+      },
+    }))
+    return [...fromLocal, ...fromRemote]
+  }, [localForDoctor, remote])
 
   useEffect(() => {
-    let cancelled = false
+    if (!doctorId) return
+    void dispatch(fetchReviewsByDoctorId(doctorId))
+  }, [dispatch, doctorId])
 
-    const load = async () => {
-      setLoading(true)
-      setError(null)
-      try {
-        const id = doctorId ?? ''
-        const res = await fetch(
-          `${BASE_URL}/comments?postId=${id}`,
-        )
-        if (!res.ok) {
-          throw new Error(`Could not load comments (${res.status})`)
-        }
-        const json = (await res.json()) as JsonPlaceholderComment[]
-        if (!cancelled) {
-          setData(json)
-        }
-      } catch (e) {
-        if (!cancelled) {
-          setError(e instanceof Error ? e.message : 'Failed to load comments')
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false)
-        }
-      }
-    }
-
-    void load()
-    return () => {
-      cancelled = true
-    }
-  }, [doctorId])
+  const handleAddReview = () => {
+    if (!doctorId) return
+    dispatch(
+      addReview({
+        doctorId,
+        title: 'Anonymous patient',
+        email: 'patient.placeholder@example.com',
+        body:
+          'Excellent care and clear communication. This review was added from the app as sample data.',
+      }),
+    )
+  }
 
   return (
     <div className="min-h-svh bg-slate-50 px-4 py-8 text-slate-900 md:px-6">
@@ -75,6 +82,7 @@ const Reviews = () => {
             <button
               type="button"
               className={`${buttonVariants.primary} w-full sm:w-auto sm:min-w-24`}
+              onClick={handleAddReview}
             >
               Add
             </button>
@@ -96,9 +104,9 @@ const Reviews = () => {
           >
             {error}
           </p>
-        ) : data && data.length > 0 ? (
+        ) : displayRows.length > 0 ? (
           <div className="mt-8 grid grid-cols-1 gap-6">
-            {data.map((review) => (
+            {displayRows.map(({ review }) => (
               <Review key={review.id} review={review} />
             ))}
           </div>
