@@ -38,6 +38,10 @@ const maxReviewId = (items: Review[], remote: JsonPlaceholderComment[]): number 
 }
 
 export type AddReviewPayload = Omit<Review, 'id'>
+export type DeleteReviewByIdPayload = {
+  doctorId: string
+  reviewId: number
+}
 
 export const fetchReviewsByDoctorId = createAsyncThunk<
   JsonPlaceholderComment[],
@@ -65,6 +69,15 @@ const reviewsSlice = createSlice({
       const nextId = maxReviewId(state.items, state.remoteItems) + 1
       state.items.push({ ...action.payload, id: nextId })
     },
+    deleteReviewById: (
+      state,
+      action: PayloadAction<DeleteReviewByIdPayload>,
+    ) => {
+      const { doctorId, reviewId } = action.payload
+      state.items = state.items.filter(
+        (r) => !(r.doctorId === doctorId && r.id === reviewId),
+      )
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -83,7 +96,7 @@ const reviewsSlice = createSlice({
   },
 })
 
-export const { addReview } = reviewsSlice.actions
+export const { addReview, deleteReviewById } = reviewsSlice.actions
 export default reviewsSlice.reducer
 
 const selectReviewsState = (state: RootState) => state.reviews

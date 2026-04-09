@@ -6,6 +6,7 @@ import { buttonVariants } from '../components/buttonStyles'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import {
   addReview,
+  deleteReviewById,
   fetchReviewsByDoctorId,
   selectLocalReviewsForDoctor,
   selectRemoteReviews,
@@ -48,6 +49,11 @@ const Reviews = () => {
     void dispatch(fetchReviewsByDoctorId(doctorId))
   }, [dispatch, doctorId])
 
+  const handleDeleteReview = (reviewId: number) => {
+    if (!doctorId) return
+    dispatch(deleteReviewById({ doctorId, reviewId }))
+  }
+
   const handleAddReview = () => {
     if (!doctorId) return
     dispatch(
@@ -89,6 +95,7 @@ const Reviews = () => {
             <button
               type="button"
               className={`${buttonVariants.danger} w-full sm:w-auto sm:min-w-24`}
+              onClick={() => handleDeleteReview(review.id)}
             >
               Delete
             </button>
