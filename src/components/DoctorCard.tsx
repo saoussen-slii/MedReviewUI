@@ -28,14 +28,22 @@ const DoctorCard = ({ doctor }: DoctorCardProps) => (
       <div className="mt-auto pt-2">
         <dt className="sr-only">Professional profile</dt>
         <dd>
-          <a
-            href={doctor.professionalProfileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
-          >
-            Professional profile
-          </a>
+          <div className="flex flex-col justify-end gap-4 sm:flex-row">
+            <a
+              href={doctor.professionalProfileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+            >
+              Professional profile
+            </a>
+            <button
+              type="button"
+              className="inline-flex items-center justify-center rounded-lg border border-teal-600 bg-white px-4 py-2 text-sm font-semibold text-teal-700 shadow-sm transition-colors hover:bg-teal-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-600"
+            >
+              Reviews
+            </button>
+          </div>
         </dd>
       </div>
     </dl>
