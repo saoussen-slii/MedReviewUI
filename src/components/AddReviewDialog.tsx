@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Dialog from '@mui/material/Dialog'
 import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
@@ -27,12 +27,6 @@ const emptyForm: AddReviewFormPayload = {
 const AddReviewDialog = ({ open, onClose, onSubmit }: AddReviewDialogProps) => {
   const [form, setForm] = useState(emptyForm)
 
-  useEffect(() => {
-    if (!open) {
-      setForm(emptyForm)
-    }
-  }, [open])
-
   const canSubmit =
     form.title.trim().length > 0 &&
     form.email.trim().length > 0 &&
@@ -50,8 +44,7 @@ const AddReviewDialog = ({ open, onClose, onSubmit }: AddReviewDialogProps) => {
       email: form.email.trim(),
       body: form.body.trim(),
     })
-    setForm(emptyForm)
-    onClose()
+    handleClose()
   }
 
   return (
