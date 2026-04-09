@@ -1,48 +1,26 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 import DoctorCard from '../components/DoctorCard'
 import DoctorCardSkeleton from '../components/DoctorCardSkeleton'
-import type { Doctor, JsonPlaceholderUser } from '../types'
-import { mapUserToDoctor } from './doctorsUtils'
-import { SKELETON_IDS, BASE_URL } from './doctorsConstants'
+import { useAppDispatch, useAppSelector } from '../store/hooks'
+import {
+  fetchDoctors,
+  selectDoctors,
+  selectDoctorsError,
+  selectDoctorsLoading,
+} from '../store/slices/doctorsSlice'
+import { SKELETON_IDS } from './doctorsConstants'
 
 const Doctors = () => {
-  const [doctors, setDoctors] = useState<Doctor[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const dispatch = useAppDispatch()
+  const doctors = useAppSelector(selectDoctors)
+  const loading = useAppSelector(selectDoctorsLoading)
+  const error = useAppSelector(selectDoctorsError)
 
   useEffect(() => {
-    let cancelled = false
-
-    const load = async () => {
-      setLoading(true)
-      setError(null)
-      try {
-        const res = await fetch(`${BASE_URL}/users`)
-        if (!res.ok) {
-          throw new Error(`Could not load directory (${res.status})`)
-        }
-        const data = (await res.json()) as JsonPlaceholderUser[]
-        if (!cancelled) {
-          setDoctors(data.map(mapUserToDoctor))
-        }
-      } catch (e) {
-        if (!cancelled) {
-          setError(e instanceof Error ? e.message : 'Failed to load doctors')
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false)
-        }
-      }
-    }
-
-    void load()
-    return () => {
-      cancelled = true
-    }
-  }, [])
+    void dispatch(fetchDoctors())
+  }, [dispatch])
 
   return (
     <div className="min-h-svh bg-slate-50 px-4 py-8 text-slate-900 md:px-6">
