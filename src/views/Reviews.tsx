@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import {  BASE_URL } from './doctorsConstants'
+
+import Review from '../components/Review'
+import { BASE_URL } from './doctorsConstants'
 
 type JsonPlaceholderComment = {
   postId: number
@@ -15,7 +17,7 @@ const Reviews = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [data, setData] = useState<JsonPlaceholderComment[] | null>(null)
-console.log("id that we passed in", doctorId)
+
   useEffect(() => {
     let cancelled = false
 
@@ -77,10 +79,14 @@ console.log("id that we passed in", doctorId)
           >
             {error}
           </p>
+        ) : data && data.length > 0 ? (
+          <div className="mt-8 grid grid-cols-1 gap-6">
+            {data.map((review) => (
+              <Review key={review.id} review={review} />
+            ))}
+          </div>
         ) : (
-          <p className="mt-8 whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-white p-4 font-mono text-xs text-slate-800 shadow-sm">
-            {JSON.stringify(data, null, 2)}
-          </p>
+          <p className="mt-8 text-sm text-slate-600">No reviews found.</p>
         )}
       </div>
     </div>
